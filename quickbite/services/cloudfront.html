@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how Amazon CloudFront powers QuickBite with global content delivery and HTTPS.">
+    <title>Amazon CloudFront — QuickBite AWS Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg-base:#07070d;--bg-surface:#0e0e19;--bg-card:rgba(16,16,28,0.78);--bg-input:rgba(22,22,40,0.92);--text-1:#f0f0f6;--text-2:#9a9ab5;--text-3:#5e5e78;--accent:#f97316;--accent-h:#fb923c;--accent-glow:rgba(249,115,22,0.22);--accent-soft:rgba(249,115,22,0.09);--green:#22c55e;--green-glow:rgba(34,197,94,0.14);--border:rgba(255,255,255,0.06);--border-h:rgba(255,255,255,0.12);--border-a:rgba(249,115,22,0.28);--radius:14px;--radius-full:9999px;--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--font);background:var(--bg-base);color:var(--text-1);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(ellipse 600px 500px at 18% 8%,rgba(249,115,22,0.07),transparent),radial-gradient(ellipse 500px 450px at 82% 85%,rgba(168,85,247,0.05),transparent),linear-gradient(rgba(255,255,255,0.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.013) 1px,transparent 1px);background-size:100% 100%,100% 100%,52px 52px,52px 52px}
+        .orb{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0}.orb-1{width:450px;height:450px;background:rgba(249,115,22,0.075);top:-120px;right:-100px}.orb-2{width:380px;height:380px;background:rgba(168,85,247,0.055);bottom:-70px;left:-80px}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,7,13,0.72);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid var(--border)}.nav-inner{max-width:820px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:1.3rem;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text-1)}.brand-accent{color:var(--accent)}.back-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-full);border:1px solid var(--border);background:transparent;color:var(--text-2);font-family:var(--font);font-size:0.78rem;font-weight:500;cursor:pointer;transition:0.25s ease;text-decoration:none}.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+        .main{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:96px 24px 60px}
+        .service-hero{text-align:center;padding:44px 0 40px;animation:fadeUp 500ms ease}.service-icon{font-size:3.5rem;margin-bottom:16px}.service-tag{display:inline-block;padding:4px 14px;border-radius:var(--radius-full);background:var(--accent-soft);border:1px solid var(--border-a);font-size:0.7rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}.service-hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-1.5px;margin-bottom:12px}.gradient-text{background:linear-gradient(135deg,var(--accent) 0%,#fb923c 40%,#fbbf24 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.service-hero p{font-size:1.05rem;color:var(--text-2);max-width:540px;margin:0 auto}
+        .section{margin-top:36px;animation:fadeUp 500ms ease backwards}.section:nth-child(2){animation-delay:80ms}.section:nth-child(3){animation-delay:160ms}.section:nth-child(4){animation-delay:240ms}.section:nth-child(5){animation-delay:320ms}
+        .section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(14px);transition:border-color 0.3s}.section-card:hover{border-color:var(--border-h)}.section-title{font-size:1.1rem;font-weight:700;letter-spacing:-0.3px;margin-bottom:16px;display:flex;align-items:center;gap:10px}.section-title .icon{font-size:1.2rem}.section-body{color:var(--text-2);font-size:0.92rem;line-height:1.7}.section-body p{margin-bottom:12px}.section-body ul{padding-left:20px;margin-bottom:12px}.section-body li{margin-bottom:6px}.section-body strong{color:var(--text-1)}
+        .code-block{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:12px;padding:20px;overflow-x:auto;margin:16px 0}.code-block code{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:0.82rem;color:#e2e8f0;line-height:1.7;white-space:pre}.code-label{font-size:0.68rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
+        .highlight-card{background:var(--accent-soft);border:1px solid var(--border-a);border-radius:14px;padding:20px 24px;margin-top:16px}.highlight-card h4{color:var(--accent);font-size:0.85rem;font-weight:700;margin-bottom:6px}.highlight-card p{color:var(--text-2);font-size:0.85rem;line-height:1.6}
+        .nav-services{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:40px;padding-top:28px;border-top:1px solid var(--border);animation:fadeUp 500ms ease 400ms backwards}.nav-services a{padding:5px 14px;border-radius:var(--radius-full);background:var(--bg-card);border:1px solid var(--border);font-size:0.72rem;font-weight:500;color:var(--text-3);text-decoration:none;transition:0.25s ease}.nav-services a:hover{border-color:var(--border-a);color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}.nav-services a.current{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .footer{text-align:center;padding:44px 24px 32px;color:var(--text-3);font-size:0.8rem;border-top:1px solid var(--border);margin-top:56px;position:relative;z-index:1}.footer strong{color:var(--text-2)}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@media(max-width:600px){.section-card{padding:22px 18px}.service-hero h1{letter-spacing:-1px}}
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div>
+    <nav class="navbar"><div class="nav-inner">
+        <a class="brand" href="../index.html"><span>🍔</span><span>Quick<span class="brand-accent">Bite</span></span></a>
+        <a class="back-btn" href="../index.html">← Back to App</a>
+    </div></nav>
+
+    <main class="main">
+        <section class="service-hero">
+            <div class="service-icon">🌐</div>
+            <div class="service-tag">Content Delivery Network</div>
+            <h1><span class="gradient-text">Amazon CloudFront</span></h1>
+            <p>A blazing-fast CDN that delivers your content globally from 400+ edge locations with ultra-low latency.</p>
+        </section>
+
+        <div class="section"><div class="section-card">
+            <div class="section-title"><span class="icon">📖</span> What is CloudFront?</div>
+            <div class="section-body">
+                <p>Amazon CloudFront is a <strong>Content Delivery Network (CDN)</strong> that securely delivers your website, APIs, and streaming content to users around the world with <strong>low latency and high transfer speeds</strong>.</p>
+                <p>Instead of every user hitting your S3 bucket in Mumbai, CloudFront <strong>caches copies</strong> of your website at edge locations near each user — Tokyo, London, New York, everywhere.</p>
+            </div>
+        </div></div>
+
+        <div class="section"><div class="section-card">
+            <div class="section-title"><span class="icon">⚙️</span> How Does It Work?</div>
+            <div class="section-body">
+                <ul>
+                    <li><strong>Origin</strong> — Your S3 bucket is the "origin" where the real files live</li>
+                    <li><strong>Distribution</strong> — CloudFront creates a distribution that maps to your origin</li>
+                    <li><strong>Edge Locations</strong> — 400+ data centers worldwide cache your content</li>
+                    <li><strong>HTTPS</strong> — Automatic SSL/TLS certificates for secure connections</li>
+                    <li><strong>Cache Invalidation</strong> — Force refresh when you update files</li>
+                </ul>
+                <p>When a user in London visits your site, CloudFront serves it from the nearest edge — <strong>~20ms</strong> instead of <strong>~200ms</strong> from Mumbai!</p>
+            </div>
+        </div></div>
+
+        <div class="section"><div class="section-card">
+            <div class="section-title"><span class="icon">💻</span> Code Example</div>
+            <div class="section-body">
+                <div class="code-label">AWS CLI — Create a Cache Invalidation</div>
+                <div class="code-block"><code># After uploading new index.html to S3,
+# invalidate the CloudFront cache so users see the update:
+
+aws cloudfront create-invalidation \
+    --distribution-id E1234ABCDEF \
+    --paths "/*"
+
+# This tells CloudFront: "Forget the old cached files,
+# go fetch the new ones from S3."</code></div>
+                <div class="code-label">CloudFront Distribution Settings</div>
+                <div class="code-block"><code># Key configuration for QuickBite:
+Origin:           quickbite-frontend.s3.amazonaws.com
+Protocol:         HTTPS only (redirect HTTP → HTTPS)
+Default Root:     index.html
+Price Class:      Use All Edge Locations
+Cache Policy:     CachingOptimized (TTL: 24 hours)</code></div>
+            </div>
+        </div></div>
+
+        <div class="section"><div class="section-card">
+            <div class="section-title"><span class="icon">🍔</span> How I Used It in QuickBite</div>
+            <div class="section-body">
+                <p>CloudFront is the <strong>gateway to QuickBite</strong> — every user accesses the app through our CloudFront URL.</p>
+                <div class="highlight-card">
+                    <h4>🌍 Global HTTPS Delivery</h4>
+                    <p>CloudFront sits in front of the S3 bucket, providing a secure <code>https://dXXXXXX.cloudfront.net</code> URL. It serves <strong>index.html</strong> and all service pages with automatic HTTPS encryption and global caching.</p>
+                </div>
+                <div class="highlight-card" style="margin-top:12px">
+                    <h4>⚡ Performance Boost</h4>
+                    <p>Users in any country get the QuickBite website from the nearest edge location instead of waiting for a round-trip to ap-south-1 (Mumbai). This reduces load times from seconds to milliseconds.</p>
+                </div>
+            </div>
+        </div></div>
+
+        <nav class="nav-services">
+            <a href="s3.html">S3</a><a href="cloudfront.html" class="current">CloudFront</a><a href="api-gateway.html">API Gateway</a><a href="lambda.html">Lambda</a><a href="dynamodb.html">DynamoDB</a><a href="sqs.html">SQS</a><a href="ses.html">SES</a><a href="sns.html">SNS</a><a href="cloudwatch.html">CloudWatch</a>
+        </nav>
+    </main>
+    <footer class="footer">Built with ☁️ by <strong>Naman Panwar</strong> — QuickBite Serverless on <strong>AWS</strong></footer>
+</body>
+</html>

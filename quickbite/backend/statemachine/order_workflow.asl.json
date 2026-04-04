@@ -1,0 +1,71 @@
+{
+  "Comment": "QuickBite Serverless Order Processing Workflow",
+  "StartAt": "CheckInventory",
+  "States": {
+    "CheckInventory": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "Parameters": {
+        "TableName": "QuickBite-Restaurants",
+        "Key": {
+          "restaurantId": {"S.$": "$.cart[0].restaurantId"}
+        }
+      },
+      "Next": "ProcessMockPayment",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.TaskFailed"],
+          "Next": "FailOrder"
+        }
+      ]
+    },
+    "ProcessMockPayment": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCOUNT:function:ProcessPaymentLambda",
+      "Next": "SaveOrderToDB",
+      "Catch": [
+        {
+          "ErrorEquals": ["PaymentDeclinedException"],
+          "Next": "FailOrder"
+        }
+      ]
+    },
+    "SaveOrderToDB": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "QuickBite-Orders",
+        "Item": {
+          "orderId": {"S.$": "$.orderId"},
+          "email": {"S.$": "$.userEmail"},
+          "status": {"S": "CONFIRMED"},
+          "totalAmount": {"N.$": "States.Format('{}', $.totalAmount)"}
+        }
+      },
+      "Next": "PushToKitchenQueue"
+    },
+    "PushToKitchenQueue": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sqs:sendMessage",
+      "Parameters": {
+        "QueueUrl": "https://sqs.REGION.amazonaws.com/ACCOUNT/QuickBite-KitchenQueue",
+        "MessageBody.$": "$"
+      },
+      "Next": "SendConfirmationEmail"
+    },
+    "SendConfirmationEmail": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:REGION:ACCOUNT:QuickBite-OrderUpdates",
+        "Message": "Your QuickBite order is confirmed and sent to the kitchen!"
+      },
+      "End": true
+    },
+    "FailOrder": {
+      "Type": "Fail",
+      "Error": "OrderProcessingFailed",
+      "Cause": "The order failed due to inventory or payment issues."
+    }
+  }
+}

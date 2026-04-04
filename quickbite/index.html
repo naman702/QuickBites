@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="QuickBite — A production-grade serverless food ordering system built on AWS Lambda, DynamoDB, SQS, SES, SNS, Step Functions & CloudWatch.">
+    <title>QuickBite 🍔 — Serverless Food Ordering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+
+    <!-- ====== SPLASH SCREEN ====== -->
+    <div class="splash-screen" id="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <span class="splash-emoji">🍔</span>
+                <span class="splash-brand">Quick<span class="splash-accent">Bite</span></span>
+            </div>
+            <div class="splash-tagline">Serverless Food Ordering</div>
+            <div class="splash-loader">
+                <div class="splash-loader-bar"></div>
+            </div>
+            <div class="splash-aws">☁️ Powered by AWS</div>
+        </div>
+    </div>
+
+    <!-- ====== Animated Background Canvas ====== -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Tooltip Container -->
+    <div class="tooltip-container" id="tooltip-container">
+        <div class="tooltip-box">
+            <div class="tooltip-arrow" id="tooltip-arrow"></div>
+            <div class="tooltip-header">
+                <div class="tooltip-icon" id="tooltip-icon"></div>
+                <div>
+                    <div class="tooltip-name" id="tooltip-name"></div>
+                    <div class="tooltip-tag" id="tooltip-tag">AWS Service</div>
+                </div>
+            </div>
+            <div class="tooltip-desc" id="tooltip-desc"></div>
+            <div class="tooltip-usage">
+                <div class="tooltip-usage-label">📌 In This Project</div>
+                <div class="tooltip-usage-text" id="tooltip-usage"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- ====== Navbar ====== -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <div class="brand" onclick="window.location.reload()" style="cursor:pointer">
+                <span class="brand-emoji">🍔</span>
+                <span>Quick<span class="brand-accent">Bite</span></span>
+            </div>
+            <div class="nav-right">
+                <div class="city-banner" id="city-banner" style="display:none"></div>
+                <div class="aws-pill"><span class="aws-dot"></span> Serverless on AWS</div>
+                <!-- Cart Icon -->
+                <button class="nav-cart" id="nav-cart-btn" onclick="openCartDrawer()" title="View Cart" style="display:none">
+                    🛒
+                    <span class="nav-cart-badge" id="nav-cart-badge">0</span>
+                </button>
+                <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <!-- Profile -->
+                <div class="user-profile" id="user-profile">
+                    <img class="user-avatar" id="user-avatar" src="" alt="avatar" onclick="toggleProfileDropdown()">
+                    <!-- Glass Dropdown -->
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-dropdown-header">
+                            <div class="profile-dropdown-name" id="dropdown-name"></div>
+                            <div class="profile-dropdown-email" id="dropdown-email"></div>
+                        </div>
+                        <button class="profile-dropdown-item" onclick="switchTab('history');closeProfileDropdown()">
+                            📋 My Orders
+                        </button>
+                        <button class="profile-dropdown-item" onclick="toggleTheme();closeProfileDropdown()">
+                            <span id="dropdown-theme-icon">🌙</span> Toggle Theme
+                        </button>
+                        <button class="profile-dropdown-item danger" onclick="handleSignOut()">
+                            👋 Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ====== Main ====== -->
+    <main class="main">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-chip">⚡ Powered by 9 AWS Services</div>
+            <!-- Scroll indicator -->
+            <div class="scroll-indicator" id="scroll-indicator">
+                <div class="scroll-indicator-dot"></div>
+            </div>
+            <h1>Order Your Favorite<br><span class="gradient-text">Food in Seconds</span></h1>
+            <p>A fully serverless ordering system — no servers, no waiting. Your order flows through Lambda, DynamoDB,
+                SQS, SES &amp; SNS in real time.</p>
+            <div class="aws-services-section">
+                <div class="aws-services-grid" id="aws-services-grid">
+                    <div class="aws-service-card" data-service="s3" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/s3.html'">
+                        <div class="aws-service-icon">🪣</div>
+                        <div class="aws-service-name">S3</div>
+                    </div>
+                    <div class="aws-service-card" data-service="cloudfront" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/cloudfront.html'">
+                        <div class="aws-service-icon">🌐</div>
+                        <div class="aws-service-name">CloudFront</div>
+                    </div>
+                    <div class="aws-service-card" data-service="api-gateway" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/api-gateway.html'">
+                        <div class="aws-service-icon">🚪</div>
+                        <div class="aws-service-name">API Gateway</div>
+                    </div>
+                    <div class="aws-service-card" data-service="lambda" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/lambda.html'">
+                        <div class="aws-service-icon">λ</div>
+                        <div class="aws-service-name">Lambda</div>
+                    </div>
+                    <div class="aws-service-card" data-service="dynamodb" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/dynamodb.html'">
+                        <div class="aws-service-icon">📊</div>
+                        <div class="aws-service-name">DynamoDB</div>
+                    </div>
+                    <div class="aws-service-card" data-service="sqs" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/sqs.html'">
+                        <div class="aws-service-icon">📨</div>
+                        <div class="aws-service-name">SQS</div>
+                    </div>
+                    <div class="aws-service-card" data-service="ses" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/ses.html'">
+                        <div class="aws-service-icon">📧</div>
+                        <div class="aws-service-name">SES</div>
+                    </div>
+                    <div class="aws-service-card" data-service="sns" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/sns.html'">
+                        <div class="aws-service-icon">🔔</div>
+                        <div class="aws-service-name">SNS</div>
+                    </div>
+                    <div class="aws-service-card" data-service="cloudwatch" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/cloudwatch.html'">
+                        <div class="aws-service-icon">📈</div>
+                        <div class="aws-service-name">CloudWatch</div>
+                    </div>
+                </div>
+                <p class="chip-click-hint">Hover for info • Click to learn more ↗</p>
+            </div>
+        </section>
+
+        <!-- ====== AUTH CARD (Login / Signup) ====== -->
+        <div class="login-card" id="login-card">
+            <div class="lock-icon">🔐</div>
+            <h2 id="auth-title">Sign in to Order</h2>
+            <p id="auth-subtitle">Login with your account or sign up to get started.</p>
+
+            <!-- Auth Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="auth-tab-login" onclick="switchAuthMode('login')">Login</button>
+                <button class="auth-tab" id="auth-tab-signup" onclick="switchAuthMode('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form" onsubmit="handleEmailLogin(event)">
+                <input class="form-input auth-input" type="email" id="login-email" placeholder="Email address" required>
+                <div class="password-wrapper">
+                    <input class="form-input auth-input" type="password" id="login-password" placeholder="Password" required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-password', this)">👁️</button>
+                </div>
+                <button type="submit" class="btn auth-submit-btn">
+                    <span class="label">🔐 Login</span>
+                    <span class="loading"><span class="spinner"></span> Authenticating…</span>
+                </button>
+                <div class="auth-error" id="login-error"></div>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form" style="display:none" onsubmit="handleEmailSignup(event)">
+                <input class="form-input auth-input" type="text" id="signup-name" placeholder="Full Name" required>
+                <input class="form-input auth-input" type="email" id="signup-email" placeholder="Email address" required>
+                <div class="password-wrapper">
+                    <input class="form-input auth-input" type="password" id="signup-password" placeholder="Password (min 6 chars)" required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-password', this)">👁️</button>
+                </div>
+                <div class="password-wrapper">
+                    <input class="form-input auth-input" type="password" id="signup-confirm" placeholder="Confirm Password" required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-confirm', this)">👁️</button>
+                </div>
+                <button type="submit" class="btn auth-submit-btn">
+                    <span class="label">✨ Create Account</span>
+                    <span class="loading"><span class="spinner"></span> Creating account…</span>
+                </button>
+                <div class="auth-error" id="signup-error"></div>
+            </form>
+
+            <!-- Divider -->
+            <div class="login-divider">or continue with</div>
+
+            <!-- Google Sign-In -->
+            <div id="google-signin-container">
+                <div id="g_id_onload"
+                    data-client_id="85841838191-0aaklpmqbsnmhi18j7p7p7165gjd1ig3.apps.googleusercontent.com"
+                    data-callback="handleGoogleCredential"
+                    data-auto_prompt="false"
+                    data-context="signin"
+                    data-ux_mode="popup">
+                </div>
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-shape="rectangular"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-logo_alignment="left"
+                    data-width="280">
+                </div>
+            </div>
+
+            <!-- Fallback Google Button -->
+            <button class="google-btn" id="google-btn-fallback" style="display:none" onclick="handleGoogleSignInFallback()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                </svg>
+                Sign in with Google
+            </button>
+
+            <div class="cognito-note">
+                <span class="cognito-badge">☁️ AWS Cognito</span>
+                Authentication powered by Amazon Cognito User Pool
+            </div>
+        </div>
+
+        <!-- ====== TABBED APP (after login) ====== -->
+        <div class="tabs-container" id="tabs-container">
+
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <button class="tab-btn active" id="tab-order" onclick="switchTab('order')">🍔 Place Order</button>
+                <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
+                    📋 My Orders <span class="tab-badge" id="orders-count" style="display:none">0</span>
+                </button>
+                <button class="tab-btn" id="tab-admin" onclick="switchTab('admin')">⚙️ Admin</button>
+            </div>
+
+            <!-- ═══ TAB 1: Place Order ═══ -->
+            <div class="tab-panel active" id="panel-order">
+                <div class="card" style="max-width:860px;margin:0 auto;">
+
+                    <!-- STEP 1: Restaurants (location is handled by modal now) -->
+                    <!-- Location step removed — GPS modal handles city detection -->
+
+                    <!-- STEP 2: Restaurant Discovery -->
+                    <div class="step-view active" id="step-restaurants">
+                        <div class="restaurants-header">
+                            <h3 id="restaurants-heading">🍽️ Restaurants</h3>
+                            <span class="location-badge" id="location-badge">📍</span>
+                        </div>
+
+                        <!-- Search Bar -->
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input class="search-input" type="text" id="search-input"
+                                placeholder="Search restaurants or dishes..."
+                                oninput="handleSearch(this.value)">
+                            <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+                        </div>
+
+                        <!-- Filter Bar -->
+                        <div class="filter-bar" id="filter-bar">
+                            <button class="filter-pill" data-filter="sort" data-value="price-low"
+                                onclick="toggleFilter(this)">💰 Price ↑</button>
+                            <button class="filter-pill" data-filter="sort" data-value="price-high"
+                                onclick="toggleFilter(this)">💰 Price ↓</button>
+                            <span class="filter-divider"></span>
+                            <button class="filter-pill" data-filter="rating" data-value="4"
+                                onclick="toggleFilter(this)">⭐ 4+</button>
+                            <button class="filter-pill" data-filter="rating" data-value="3"
+                                onclick="toggleFilter(this)">⭐ 3+</button>
+                            <span class="filter-divider"></span>
+                            <button class="filter-pill" data-filter="offer" data-value="any"
+                                onclick="toggleFilter(this)">🏷️ Offers</button>
+                            <span class="filter-divider"></span>
+                            <button class="filter-pill" data-filter="type" data-value="veg"
+                                onclick="toggleFilter(this)">🟢 Veg</button>
+                            <button class="filter-pill" data-filter="type" data-value="nonveg"
+                                onclick="toggleFilter(this)">🔴 Non-Veg</button>
+                        </div>
+
+                        <!-- Restaurant Grid -->
+                        <div class="restaurant-grid" id="restaurant-grid"></div>
+                        <div class="no-results" id="no-results" style="display:none">
+                            <div class="no-results-icon">🔍</div>
+                            <h3>No restaurants found</h3>
+                            <p>Try adjusting your search or filters</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Food Menu -->
+                    <div class="step-view" id="step-menu">
+                        <button class="menu-back" onclick="goToStep('restaurants')">← All Restaurants</button>
+                        <div class="menu-rest-info" id="menu-rest-info"></div>
+
+                        <!-- Menu Search -->
+                        <div class="search-container" style="margin-bottom:14px;">
+                            <span class="search-icon">🔍</span>
+                            <input class="search-input" type="text" id="menu-search-input"
+                                placeholder="Search this menu..."
+                                oninput="handleMenuSearch(this.value)">
+                            <button class="search-clear" id="menu-search-clear"
+                                onclick="clearMenuSearch()">✕</button>
+                        </div>
+
+                        <div class="food-grid" id="food-grid"></div>
+                    </div>
+
+                    <!-- STEP 4: Checkout -->
+                    <div class="step-view" id="step-checkout">
+                        <button class="menu-back" onclick="goToStep('menu')">← Back to Menu</button>
+                        <div class="card-title"><span>🛒</span> Confirm Your Order</div>
+                        <div class="card-welcome" id="card-welcome"></div>
+
+                        <form id="order-form" autocomplete="off">
+                            <!-- Order Summary -->
+                            <div class="checkout-summary" id="checkout-summary"></div>
+
+                            <!-- Personal Details -->
+                            <div class="checkout-section-title">👤 Personal Details</div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerName">
+                                    Your Name
+                                    <span class="autofill-tag" id="name-tag" style="display:none">✓ auto-filled</span>
+                                </label>
+                                <input class="form-input" type="text" id="customerName" placeholder="e.g. Rahul Shah"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerEmail">
+                                    Your Email
+                                    <span class="autofill-tag" id="email-tag" style="display:none">✓ auto-filled</span>
+                                </label>
+                                <input class="form-input" type="email" id="customerEmail"
+                                    placeholder="e.g. rahul@example.com" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerPhone">Phone Number</label>
+                                <div class="phone-input-group">
+                                    <span class="phone-prefix">+91</span>
+                                    <input class="form-input" type="tel" id="customerPhone"
+                                        placeholder="10-digit mobile number" maxlength="10" pattern="[6-9][0-9]{9}"
+                                        required oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                                </div>
+                            </div>
+
+                            <!-- Delivery Address -->
+                            <div class="checkout-section-title">📍 Delivery Address</div>
+
+                            <button type="button" class="btn-detect" onclick="detectLocation()">
+                                📍 Auto-detect my location
+                            </button>
+
+                            <!-- Map Picker -->
+                            <div class="map-container">
+                                <div id="checkout-map" style="height:220px;border-radius:12px;z-index:1;"></div>
+                                <div class="map-hint">📍 Drag the pin to adjust your delivery location</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerHouse">House No. / Flat No. *</label>
+                                <input class="form-input" type="text" id="customerHouse" placeholder="e.g. B-204, 3rd Floor" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerStreet">Street Name *</label>
+                                <input class="form-input" type="text" id="customerStreet" placeholder="e.g. MG Road, Station Road" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerArea">Area / Locality *</label>
+                                <input class="form-input" type="text" id="customerArea" placeholder="e.g. Navrangpura, Andheri West" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerLandmark">Nearby Landmark (optional)</label>
+                                <input class="form-input" type="text" id="customerLandmark"
+                                    placeholder="e.g. Near SBI Bank, Opposite City Mall">
+                            </div>
+
+                            <div class="form-row form-row-3">
+                                <div class="form-group">
+                                    <label class="form-label" for="customerCity">City</label>
+                                    <input class="form-input autofilled" type="text" id="customerCity" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="customerState">State</label>
+                                    <input class="form-input autofilled" type="text" id="customerState" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="customerPincode">
+                                        Pincode *
+                                        <span class="autofill-tag" id="pincode-tag" style="display:none">✓ auto-filled</span>
+                                    </label>
+                                    <input class="form-input" type="text" id="customerPincode" placeholder="362560"
+                                        maxlength="6" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="customerDeliveryNote">Delivery Note (optional)</label>
+                                <input class="form-input" type="text" id="customerDeliveryNote"
+                                    placeholder="e.g. Ring doorbell twice, call on arrival">
+                            </div>
+
+                            <input type="hidden" id="item">
+
+                            <button class="btn" type="submit" id="submit-btn">
+                                <span class="label">🍔 Place Order</span>
+                                <span class="loading"><span class="spinner"></span> Placing your order…</span>
+                            </button>
+                            <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+                                <span class="aws-badge"><span class="aws-badge-icon">⚡</span> Powered by Lambda</span>
+                                <span class="aws-badge blue"><span class="aws-badge-icon">📊</span> Stored in DynamoDB</span>
+                            </div>
+                        </form>
+
+                        <div class="result" id="success">
+                            <div class="success-box">
+                                <svg class="check-svg" viewBox="0 0 52 52">
+                                    <circle class="check-circle" cx="26" cy="26" r="25" />
+                                    <path class="check-mark" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                                </svg>
+                                <h3>Order Placed Successfully! 🎉</h3>
+                                <p>A confirmation receipt has been sent to your <strong>email</strong>.</p>
+                                <div class="order-badge" id="order-id">ORD-XXXXXX</div>
+                                <br>
+                                <button class="btn-ghost" onclick="resetForm()">Place Another Order</button>
+                            </div>
+                        </div>
+
+                        <div class="result" id="error">
+                            <div class="error-box">
+                                <h3>⚠️ Something went wrong</h3>
+                                <p id="error-msg">Please try again in a moment.</p>
+                                <button class="btn-ghost" onclick="resetForm()">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ═══ TAB 2: My Orders ═══ -->
+            <div class="tab-panel" id="panel-history">
+                <div class="orders-card">
+                    <div class="card-title"><span>📋</span> Order History</div>
+                    <div class="card-welcome" id="history-welcome"></div>
+                    <div class="orders-loading" id="orders-loading">
+                        <div class="spinner-lg"></div> Fetching your orders…
+                    </div>
+                    <div class="orders-empty" id="orders-empty" style="display:none;">
+                        <div class="empty-icon">🍽️</div>
+                        <h3>No orders yet</h3>
+                        <p>Place your first order and it will show up here!</p>
+                    </div>
+                    <div class="order-list" id="order-list" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- ═══ TAB 3: Admin Dashboard ═══ -->
+            <div class="tab-panel" id="panel-admin">
+                <div class="admin-dashboard">
+                    <div class="admin-header">
+                        <div class="card-title"><span>⚙️</span> Admin Dashboard</div>
+                        <div class="admin-subtitle">Real-time overview of your QuickBite operations</div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="admin-stats-grid" id="admin-stats-grid">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon">📦</div>
+                            <div class="admin-stat-value" id="stat-total-orders">0</div>
+                            <div class="admin-stat-label">Total Orders</div>
+                        </div>
+                        <div class="admin-stat-card revenue">
+                            <div class="admin-stat-icon">💰</div>
+                            <div class="admin-stat-value" id="stat-total-revenue">₹0</div>
+                            <div class="admin-stat-label">Total Revenue</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon">📊</div>
+                            <div class="admin-stat-value" id="stat-avg-order">₹0</div>
+                            <div class="admin-stat-label">Avg Order Value</div>
+                        </div>
+                        <div class="admin-stat-card success-card">
+                            <div class="admin-stat-icon">✅</div>
+                            <div class="admin-stat-value" id="stat-success-rate">0%</div>
+                            <div class="admin-stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Chart -->
+                    <div class="admin-section">
+                        <div class="admin-section-title">📈 Revenue Overview (Last 7 Days)</div>
+                        <div class="admin-chart" id="admin-chart"></div>
+                    </div>
+
+                    <!-- Popular Items -->
+                    <div class="admin-section">
+                        <div class="admin-section-title">🔥 Popular Items</div>
+                        <div class="admin-popular-items" id="admin-popular-items"></div>
+                    </div>
+
+                    <!-- Live Orders Table -->
+                    <div class="admin-section">
+                        <div class="admin-section-title">📋 All Orders</div>
+                        <div class="admin-orders-table" id="admin-orders-table"></div>
+                        <div class="admin-orders-empty" id="admin-orders-empty" style="display:none">
+                            <div class="empty-icon">📭</div>
+                            <h3>No orders yet</h3>
+                            <p>Orders will appear here in real-time</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- How It Works — AWS Pipeline Storytelling -->
+        <section class="flow" id="pipeline-section">
+            <div class="pipeline-section-chip">☁️ Live AWS Pipeline</div>
+            <h2><span class="gradient-text">How Your Order Travels</span></h2>
+            <p class="flow-sub">Watch your order flow through 6 serverless AWS services in real time</p>
+            <div class="pipeline-progress-bar" id="pipeline-progress-bar">
+                <div class="pipeline-progress-fill" id="pipeline-progress-fill"></div>
+            </div>
+            <div class="pipeline-container" id="pipeline-container"></div>
+            <div class="pipeline-detail" id="pipeline-detail"></div>
+            <button class="pipeline-replay-btn" id="pipeline-replay-btn" onclick="replayPipeline()" title="Replay animation">
+                <span class="replay-icon">↻</span> Replay Flow
+            </button>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-credit">Built with &#9749;&#65039; by <strong>Naman Panwar</strong> &mdash; QuickBite Serverless on <strong>AWS</strong></div>
+        <div class="footer-aws-bar" id="footer-aws-bar">
+            <span class="aws-badge"><span class="aws-badge-icon">🪣</span> S3</span>
+            <span class="aws-badge"><span class="aws-badge-icon">🌐</span> CloudFront</span>
+            <span class="aws-badge"><span class="aws-badge-icon">🚪</span> API Gateway</span>
+            <span class="aws-badge"><span class="aws-badge-icon">λ</span> Lambda</span>
+            <span class="aws-badge blue"><span class="aws-badge-icon">📊</span> DynamoDB</span>
+            <span class="aws-badge"><span class="aws-badge-icon">📨</span> SQS</span>
+            <span class="aws-badge"><span class="aws-badge-icon">📧</span> SES</span>
+            <span class="aws-badge"><span class="aws-badge-icon">🔔</span> SNS</span>
+            <span class="aws-badge blue"><span class="aws-badge-icon">📈</span> CloudWatch</span>
+        </div>
+    </footer>
+
+    <!-- Service Detail Modal -->
+    <div class="service-modal-overlay" id="service-modal-overlay" onclick="closeServiceModal()"></div>
+    <div class="service-modal" id="service-modal">
+        <button class="service-modal-close" onclick="closeServiceModal()">✕</button>
+        <div class="service-modal-header">
+            <div class="service-modal-icon" id="smodal-icon"></div>
+            <div>
+                <div class="service-modal-title" id="smodal-title"></div>
+                <div class="service-modal-subtitle" id="smodal-subtitle">AWS Service</div>
+            </div>
+        </div>
+        <div class="service-modal-body">
+            <div class="service-modal-desc" id="smodal-desc"></div>
+            <div class="service-modal-section">
+                <div class="service-modal-section-title orange">📌 How It's Used In QuickBite</div>
+                <div class="service-modal-section-text" id="smodal-usage"></div>
+            </div>
+            <div class="service-modal-section">
+                <div class="service-modal-section-title blue">🔗 Data Flow</div>
+                <div class="service-modal-flow" id="smodal-flow"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Permission Modal -->
+    <div class="location-modal-overlay" id="location-modal-overlay"></div>
+    <div class="location-modal" id="location-modal">
+        <div class="loc-modal-inner">
+            <div class="loc-modal-icon">📍</div>
+            <h2>Enable Location</h2>
+            <p>Allow QuickBite to detect your city for accurate restaurant results</p>
+            <div class="loc-modal-spinner" id="loc-modal-spinner" style="display:none"></div>
+            <div class="loc-modal-status" id="loc-modal-status"></div>
+            <button class="btn" id="loc-modal-gps-btn" onclick="requestGPSLocation()">
+                <span class="label">📍 Detect My Location</span>
+            </button>
+            <div class="loc-modal-divider">or select your city</div>
+            <div class="loc-modal-cities">
+                <button class="city-chip" onclick="selectCityManual('una')">📍 Una, Gujarat</button>
+                <button class="city-chip" onclick="selectCityManual('bhiwani')">📍 Bhiwani, Haryana</button>
+                <button class="city-chip" onclick="selectCityManual('new delhi')">📍 New Delhi</button>
+                <button class="city-chip" onclick="selectCityManual('mumbai')">📍 Mumbai</button>
+                <button class="city-chip" onclick="selectCityManual('ahmedabad')">📍 Ahmedabad</button>
+                <button class="city-chip" onclick="selectCityManual('jaipur')">📍 Jaipur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Payment Modal ═══ -->
+    <div class="payment-modal-overlay" id="payment-modal-overlay" onclick="closePaymentModal()"></div>
+    <div class="payment-modal" id="payment-modal">
+        <button class="service-modal-close" onclick="closePaymentModal()">✕</button>
+        <div class="payment-modal-inner">
+            <div class="payment-header">
+                <div class="payment-header-icon">💳</div>
+                <div>
+                    <div class="payment-header-title">Payment</div>
+                    <div class="payment-header-amount" id="payment-amount">₹0</div>
+                </div>
+            </div>
+
+            <!-- Payment Method Tabs -->
+            <div class="payment-methods" id="payment-methods">
+                <button class="payment-method-tab active" data-method="card" onclick="selectPaymentMethod('card')">
+                    💳 Card
+                </button>
+                <button class="payment-method-tab" data-method="upi" onclick="selectPaymentMethod('upi')">
+                    📱 UPI
+                </button>
+                <button class="payment-method-tab" data-method="cod" onclick="selectPaymentMethod('cod')">
+                    💵 Cash
+                </button>
+            </div>
+
+            <!-- Card Form -->
+            <div class="payment-form" id="pay-form-card">
+                <div class="form-group">
+                    <label class="form-label">Card Number</label>
+                    <input class="form-input" type="text" id="pay-card-number" placeholder="4242 4242 4242 4242" maxlength="19"
+                        oninput="formatCardNumber(this)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Expiry</label>
+                        <input class="form-input" type="text" id="pay-card-expiry" placeholder="MM/YY" maxlength="5"
+                            oninput="formatExpiry(this)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CVV</label>
+                        <input class="form-input" type="password" id="pay-card-cvv" placeholder="···" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cardholder Name</label>
+                    <input class="form-input" type="text" id="pay-card-name" placeholder="Name on card">
+                </div>
+            </div>
+
+            <!-- UPI Form -->
+            <div class="payment-form" id="pay-form-upi" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">UPI ID</label>
+                    <input class="form-input" type="text" id="pay-upi-id" placeholder="yourname@upi">
+                </div>
+                <div class="upi-apps">
+                    <span class="upi-app-chip">GPay</span>
+                    <span class="upi-app-chip">PhonePe</span>
+                    <span class="upi-app-chip">Paytm</span>
+                    <span class="upi-app-chip">BHIM</span>
+                </div>
+            </div>
+
+            <!-- COD Form -->
+            <div class="payment-form" id="pay-form-cod" style="display:none">
+                <div class="cod-info">
+                    <div class="cod-icon">💵</div>
+                    <h4>Cash on Delivery</h4>
+                    <p>Pay when your order arrives. Please keep exact change ready.</p>
+                </div>
+            </div>
+
+            <!-- Payment Processing -->
+            <div class="payment-processing" id="payment-processing" style="display:none">
+                <div class="payment-process-spinner"></div>
+                <div class="payment-process-text" id="payment-process-text">Processing payment...</div>
+                <div class="payment-process-steps">
+                    <div class="pp-step" id="pp-step-1"><span class="pp-step-dot"></span> Validating details</div>
+                    <div class="pp-step" id="pp-step-2"><span class="pp-step-dot"></span> Contacting bank</div>
+                    <div class="pp-step" id="pp-step-3"><span class="pp-step-dot"></span> Confirming payment</div>
+                </div>
+            </div>
+
+            <!-- Retry UI -->
+            <div class="payment-retry" id="payment-retry" style="display:none">
+                <div class="retry-icon">⚠️</div>
+                <h4>Payment Failed</h4>
+                <p id="retry-message">Transaction declined. Retrying...</p>
+                <div class="retry-progress">
+                    <div class="retry-progress-bar" id="retry-progress-bar"></div>
+                </div>
+                <div class="retry-attempts" id="retry-attempts">Attempt 1 of 3</div>
+            </div>
+
+            <button class="btn" id="pay-submit-btn" onclick="processPayment()">
+                <span class="label" id="pay-btn-label">💳 Pay ₹0</span>
+                <span class="loading"><span class="spinner"></span> Processing…</span>
+            </button>
+
+            <div class="payment-secure-note">
+                <span>🔒</span> Secured by AWS • 256-bit encryption
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Order Tracking Modal ═══ -->
+    <div class="tracking-modal-overlay" id="tracking-modal-overlay" onclick="closeTrackingModal()"></div>
+    <div class="tracking-modal" id="tracking-modal">
+        <button class="service-modal-close" onclick="closeTrackingModal()">✕</button>
+        <div class="tracking-modal-inner">
+            <div class="tracking-header">
+                <div class="tracking-order-id" id="tracking-order-id">ORD-XXXXXX</div>
+                <div class="tracking-eta" id="tracking-eta">Estimated: 30-40 min</div>
+            </div>
+            <div class="tracking-timeline" id="tracking-timeline"></div>
+            <div class="tracking-details" id="tracking-details"></div>
+            <div class="tracking-actions">
+                <button class="btn-ghost" onclick="closeTrackingModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Email Preview Modal ═══ -->
+    <div class="email-modal-overlay" id="email-modal-overlay" onclick="closeEmailModal()"></div>
+    <div class="email-modal" id="email-modal">
+        <button class="service-modal-close" onclick="closeEmailModal()">✕</button>
+        <div class="email-modal-inner">
+            <div class="email-inbox-bar">
+                <span class="email-inbox-icon">📧</span>
+                <span class="email-inbox-label">QuickBite — Email Preview</span>
+                <span class="email-inbox-badge">via Amazon SES</span>
+            </div>
+            <div class="email-preview-content" id="email-preview-content"></div>
+        </div>
+    </div>
+
+    <!-- ═══ CART ELEMENTS — kept outside <main> to preserve position:fixed ═══ -->
+    <!-- NOTE: <main> has CSS transform for its load animation. Any transform on a  -->
+    <!-- parent breaks position:fixed for children. These must be direct body children. -->
+
+    <!-- Sticky Bottom Cart Bar (Swiggy-style) -->
+    <div class="cart-bar" id="cart-bar">
+        <div class="cart-bar-left">
+            🛒 <span class="cart-bar-count" id="cart-bar-count">0</span> item(s) &nbsp;|&nbsp;
+            <span class="cart-bar-total" id="cart-bar-total">₹0</span>
+        </div>
+        <button class="cart-bar-btn" onclick="openCartDrawer()">View Cart →</button>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cart-overlay" onclick="closeCartDrawer()"></div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-drawer-header">
+            <div class="cart-drawer-title">🛒 Your Cart</div>
+            <button class="cart-drawer-close" onclick="closeCartDrawer()">✕</button>
+        </div>
+        <div id="cart-drawer-body"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

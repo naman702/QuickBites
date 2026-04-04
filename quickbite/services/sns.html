@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon SNS — QuickBite AWS Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg-base:#07070d;--bg-card:rgba(16,16,28,0.78);--text-1:#f0f0f6;--text-2:#9a9ab5;--text-3:#5e5e78;--accent:#f97316;--accent-soft:rgba(249,115,22,0.09);--border:rgba(255,255,255,0.06);--border-h:rgba(255,255,255,0.12);--border-a:rgba(249,115,22,0.28);--radius-full:9999px;--font:'Inter',-apple-system,sans-serif}
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font);background:var(--bg-base);color:var(--text-1);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(ellipse 600px 500px at 18% 8%,rgba(249,115,22,0.07),transparent),radial-gradient(ellipse 500px 450px at 82% 85%,rgba(168,85,247,0.05),transparent),linear-gradient(rgba(255,255,255,0.013) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.013) 1px,transparent 1px);background-size:100% 100%,100% 100%,52px 52px,52px 52px}
+        .orb{position:fixed;border-radius:50%;filter:blur(110px);pointer-events:none;z-index:0}.orb-1{width:450px;height:450px;background:rgba(249,115,22,0.075);top:-120px;right:-100px}.orb-2{width:380px;height:380px;background:rgba(168,85,247,0.055);bottom:-70px;left:-80px}
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,7,13,0.72);backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid var(--border)}.nav-inner{max-width:820px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:1.3rem;font-weight:800;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text-1)}.brand-accent{color:var(--accent)}.back-btn{padding:6px 14px;border-radius:var(--radius-full);border:1px solid var(--border);background:transparent;color:var(--text-2);font-family:var(--font);font-size:.78rem;text-decoration:none;transition:.25s ease}.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+        .main{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:96px 24px 60px}
+        .service-hero{text-align:center;padding:44px 0 40px;animation:fadeUp .5s ease}.service-icon{font-size:3.5rem;margin-bottom:16px}.service-tag{display:inline-block;padding:4px 14px;border-radius:var(--radius-full);background:var(--accent-soft);border:1px solid var(--border-a);font-size:.7rem;font-weight:600;color:var(--accent);text-transform:uppercase;margin-bottom:12px}.service-hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-1.5px;margin-bottom:12px}.gradient-text{background:linear-gradient(135deg,var(--accent),#fb923c 40%,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.service-hero p{font-size:1.05rem;color:var(--text-2);max-width:540px;margin:0 auto}
+        .section{margin-top:36px;animation:fadeUp .5s ease backwards}.section:nth-child(2){animation-delay:80ms}.section:nth-child(3){animation-delay:160ms}.section:nth-child(4){animation-delay:240ms}.section:nth-child(5){animation-delay:320ms}
+        .section-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(14px);transition:border-color .3s}.section-card:hover{border-color:var(--border-h)}.section-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}.section-body{color:var(--text-2);font-size:.92rem;line-height:1.7}.section-body p{margin-bottom:12px}.section-body ul{padding-left:20px;margin-bottom:12px}.section-body li{margin-bottom:6px}.section-body strong{color:var(--text-1)}
+        .code-block{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:12px;padding:20px;overflow-x:auto;margin:16px 0}.code-block code{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:.82rem;color:#e2e8f0;line-height:1.7;white-space:pre}.code-label{font-size:.68rem;font-weight:600;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+        .highlight-card{background:var(--accent-soft);border:1px solid var(--border-a);border-radius:14px;padding:20px 24px;margin-top:16px}.highlight-card h4{color:var(--accent);font-size:.85rem;font-weight:700;margin-bottom:6px}.highlight-card p{color:var(--text-2);font-size:.85rem;line-height:1.6}
+        .nav-services{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:40px;padding-top:28px;border-top:1px solid var(--border)}.nav-services a{padding:5px 14px;border-radius:var(--radius-full);background:var(--bg-card);border:1px solid var(--border);font-size:.72rem;font-weight:500;color:var(--text-3);text-decoration:none;transition:.25s ease}.nav-services a:hover{border-color:var(--border-a);color:var(--accent);background:var(--accent-soft)}.nav-services a.current{background:var(--accent);color:#fff;border-color:var(--accent)}
+        .footer{text-align:center;padding:44px 24px 32px;color:var(--text-3);font-size:.8rem;border-top:1px solid var(--border);margin-top:56px;position:relative;z-index:1}.footer strong{color:var(--text-2)}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+<div class="bg-grid"></div><div class="orb orb-1"></div><div class="orb orb-2"></div>
+<nav class="navbar"><div class="nav-inner"><a class="brand" href="../index.html"><span>🍔</span><span>Quick<span class="brand-accent">Bite</span></span></a><a class="back-btn" href="../index.html">← Back to App</a></div></nav>
+<main class="main">
+    <section class="service-hero">
+        <div class="service-icon">🔔</div>
+        <div class="service-tag">Notifications</div>
+        <h1><span class="gradient-text">Amazon SNS</span></h1>
+        <p>A pub/sub messaging service for sending notifications to subscribers via email, SMS, or HTTP endpoints.</p>
+    </section>
+    <div class="section"><div class="section-card">
+        <div class="section-title"><span class="icon">📖</span> What is Amazon SNS?</div>
+        <div class="section-body">
+            <p>Amazon SNS (Simple Notification Service) is a <strong>pub/sub messaging service</strong>. You publish a message to a "topic," and all subscribers to that topic receive it instantly — whether they're email addresses, phone numbers, or other AWS services.</p>
+            <p>Unlike SES (which sends formatted emails), SNS is designed for <strong>quick, real-time alerts</strong> — like notifying the restaurant owner that a new order just came in.</p>
+        </div>
+    </div></div>
+    <div class="section"><div class="section-card">
+        <div class="section-title"><span class="icon">⚙️</span> How Does It Work?</div>
+        <div class="section-body"><ul>
+            <li><strong>Create a Topic</strong> — A named channel (e.g., "OrderNotifications")</li>
+            <li><strong>Add Subscribers</strong> — Email, SMS, HTTP endpoint, Lambda, or SQS</li>
+            <li><strong>Publish Messages</strong> — Send a message to the topic</li>
+            <li><strong>Fan Out</strong> — All subscribers receive the message simultaneously</li>
+            <li><strong>Confirm Subscription</strong> — Email subscribers must click a confirm link</li>
+        </ul></div>
+    </div></div>
+    <div class="section"><div class="section-card">
+        <div class="section-title"><span class="icon">💻</span> Code Example</div>
+        <div class="section-body">
+            <div class="code-label">Python — Publish an order notification</div>
+            <div class="code-block"><code>import boto3
+
+sns = boto3.client("sns", region_name="ap-south-1")
+
+sns.publish(
+    TopicArn="arn:aws:sns:ap-south-1:123456:OrderNotifications",
+    Subject="🍔 New QuickBite Order!",
+    Message="""
+    New order received!
+    
+    Order ID: ORD-A1B2C3
+    Customer: Naman
+    Item: Paneer Burger
+    Time: 2026-03-29 18:00 UTC
+    
+    Please prepare this order ASAP!
+    """
+)</code></div>
+        </div>
+    </div></div>
+    <div class="section"><div class="section-card">
+        <div class="section-title"><span class="icon">🍔</span> How I Used It in QuickBite</div>
+        <div class="section-body">
+            <div class="highlight-card"><h4>🔔 Owner Alerts</h4><p>The <strong>OrderNotifications</strong> SNS topic has the restaurant owner's email as a subscriber. Every time Lambda 2 processes an order, it publishes a message — and the owner gets an instant email alert with the order details.</p></div>
+            <div class="highlight-card" style="margin-top:12px"><h4>📱 SES vs SNS — Why Both?</h4><p><strong>SES</strong> sends the styled HTML receipt to the <em>customer</em>. <strong>SNS</strong> sends a quick plain-text alert to the <em>owner</em>. Two different audiences, two different services — each optimized for its purpose.</p></div>
+        </div>
+    </div></div>
+    <nav class="nav-services"><a href="s3.html">S3</a><a href="cloudfront.html">CloudFront</a><a href="api-gateway.html">API Gateway</a><a href="lambda.html">Lambda</a><a href="dynamodb.html">DynamoDB</a><a href="sqs.html">SQS</a><a href="ses.html">SES</a><a href="sns.html" class="current">SNS</a><a href="cloudwatch.html">CloudWatch</a></nav>
+</main>
+<footer class="footer">Built with ☁️ by <strong>Naman Panwar</strong> — QuickBite Serverless on <strong>AWS</strong></footer>
+</body></html>
