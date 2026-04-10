@@ -9,11 +9,12 @@
     <title>QuickBite 🍔 — Serverless Food Ordering</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
@@ -23,14 +24,14 @@
     <div class="splash-screen" id="splash-screen">
         <div class="splash-content">
             <div class="splash-logo">
-                <span class="splash-emoji">🍔</span>
+                <span class="splash-icon-wrap"><i data-lucide="utensils" class="splash-lucide-icon"></i></span>
                 <span class="splash-brand">Quick<span class="splash-accent">Bite</span></span>
             </div>
             <div class="splash-tagline">Serverless Food Ordering</div>
             <div class="splash-loader">
                 <div class="splash-loader-bar"></div>
             </div>
-            <div class="splash-aws">☁️ Powered by AWS</div>
+            <div class="splash-aws"><i data-lucide="cloud" style="width:14px;height:14px;display:inline;vertical-align:-2px;margin-right:4px;"></i> Powered by AWS</div>
         </div>
     </div>
 
@@ -68,7 +69,7 @@
     <nav class="navbar">
         <div class="nav-inner">
             <div class="brand" onclick="window.location.reload()" style="cursor:pointer">
-                <span class="brand-emoji">🍔</span>
+                <span class="brand-icon-wrap"><i data-lucide="utensils" class="brand-lucide"></i></span>
                 <span>Quick<span class="brand-accent">Bite</span></span>
             </div>
             <div class="nav-right">
@@ -76,11 +77,11 @@
                 <div class="aws-pill"><span class="aws-dot"></span> Serverless on AWS</div>
                 <!-- Cart Icon -->
                 <button class="nav-cart" id="nav-cart-btn" onclick="openCartDrawer()" title="View Cart" style="display:none">
-                    🛒
+                    <i data-lucide="shopping-cart" style="width:18px;height:18px;"></i>
                     <span class="nav-cart-badge" id="nav-cart-badge">0</span>
                 </button>
                 <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
-                    <span id="theme-icon">🌙</span>
+                    <span id="theme-icon"><i data-lucide="moon" style="width:16px;height:16px;"></i></span>
                 </button>
                 <!-- Profile -->
                 <div class="user-profile" id="user-profile">
@@ -92,13 +93,13 @@
                             <div class="profile-dropdown-email" id="dropdown-email"></div>
                         </div>
                         <button class="profile-dropdown-item" onclick="switchTab('history');closeProfileDropdown()">
-                            📋 My Orders
+                            <i data-lucide="clipboard-list" style="width:16px;height:16px;"></i> My Orders
                         </button>
                         <button class="profile-dropdown-item" onclick="toggleTheme();closeProfileDropdown()">
-                            <span id="dropdown-theme-icon">🌙</span> Toggle Theme
+                            <i data-lucide="sun-moon" id="dropdown-theme-lucide" style="width:16px;height:16px;"></i> Toggle Theme
                         </button>
                         <button class="profile-dropdown-item danger" onclick="handleSignOut()">
-                            👋 Sign Out
+                            <i data-lucide="log-out" style="width:16px;height:16px;"></i> Sign Out
                         </button>
                     </div>
                 </div>
@@ -111,7 +112,7 @@
 
         <!-- Hero -->
         <section class="hero">
-            <div class="hero-chip">⚡ Powered by 9 AWS Services</div>
+            <div class="hero-chip"><i data-lucide="zap" style="width:14px;height:14px;"></i> Powered by 9 AWS Services</div>
             <!-- Scroll indicator -->
             <div class="scroll-indicator" id="scroll-indicator">
                 <div class="scroll-indicator-dot"></div>
@@ -122,49 +123,49 @@
             <div class="aws-services-section">
                 <div class="aws-services-grid" id="aws-services-grid">
                     <div class="aws-service-card" data-service="s3" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/s3.html'">
-                        <div class="aws-service-icon">🪣</div>
+                        <div class="aws-service-icon"><i data-lucide="hard-drive" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">S3</div>
                     </div>
                     <div class="aws-service-card" data-service="cloudfront" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/cloudfront.html'">
-                        <div class="aws-service-icon">🌐</div>
+                        <div class="aws-service-icon"><i data-lucide="globe" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">CloudFront</div>
                     </div>
                     <div class="aws-service-card" data-service="api-gateway" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/api-gateway.html'">
-                        <div class="aws-service-icon">🚪</div>
+                        <div class="aws-service-icon"><i data-lucide="door-open" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">API Gateway</div>
                     </div>
                     <div class="aws-service-card" data-service="lambda" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/lambda.html'">
-                        <div class="aws-service-icon">λ</div>
+                        <div class="aws-service-icon"><i data-lucide="code" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">Lambda</div>
                     </div>
                     <div class="aws-service-card" data-service="dynamodb" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/dynamodb.html'">
-                        <div class="aws-service-icon">📊</div>
+                        <div class="aws-service-icon"><i data-lucide="database" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">DynamoDB</div>
                     </div>
                     <div class="aws-service-card" data-service="sqs" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/sqs.html'">
-                        <div class="aws-service-icon">📨</div>
+                        <div class="aws-service-icon"><i data-lucide="mail-plus" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">SQS</div>
                     </div>
                     <div class="aws-service-card" data-service="ses" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/ses.html'">
-                        <div class="aws-service-icon">📧</div>
+                        <div class="aws-service-icon"><i data-lucide="mail" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">SES</div>
                     </div>
                     <div class="aws-service-card" data-service="sns" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/sns.html'">
-                        <div class="aws-service-icon">🔔</div>
+                        <div class="aws-service-icon"><i data-lucide="bell" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">SNS</div>
                     </div>
                     <div class="aws-service-card" data-service="cloudwatch" onmouseenter="showTooltip(this)" onmouseleave="hideTooltip()" onclick="window.location.href='services/cloudwatch.html'">
-                        <div class="aws-service-icon">📈</div>
+                        <div class="aws-service-icon"><i data-lucide="activity" style="width:22px;height:22px;"></i></div>
                         <div class="aws-service-name">CloudWatch</div>
                     </div>
                 </div>
-                <p class="chip-click-hint">Hover for info • Click to learn more ↗</p>
+                <p class="chip-click-hint">Hover for info · Click to learn more</p>
             </div>
         </section>
 
         <!-- ====== AUTH CARD (Login / Signup) ====== -->
         <div class="login-card" id="login-card">
-            <div class="lock-icon">🔐</div>
+            <div class="lock-icon"><i data-lucide="shield-check" style="width:48px;height:48px;color:var(--accent);"></i></div>
             <h2 id="auth-title">Sign in to Order</h2>
             <p id="auth-subtitle">Login with your account or sign up to get started.</p>
 
@@ -182,7 +183,7 @@
                     <button type="button" class="password-toggle" onclick="togglePasswordVisibility('login-password', this)">👁️</button>
                 </div>
                 <button type="submit" class="btn auth-submit-btn">
-                    <span class="label">🔐 Login</span>
+                    <span class="label"><i data-lucide="log-in" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Login</span>
                     <span class="loading"><span class="spinner"></span> Authenticating…</span>
                 </button>
                 <div class="auth-error" id="login-error"></div>
@@ -201,7 +202,7 @@
                     <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signup-confirm', this)">👁️</button>
                 </div>
                 <button type="submit" class="btn auth-submit-btn">
-                    <span class="label">✨ Create Account</span>
+                    <span class="label"><i data-lucide="user-plus" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Create Account</span>
                     <span class="loading"><span class="spinner"></span> Creating account…</span>
                 </button>
                 <div class="auth-error" id="signup-error"></div>
@@ -242,7 +243,7 @@
             </button>
 
             <div class="cognito-note">
-                <span class="cognito-badge">☁️ AWS Cognito</span>
+                <span class="cognito-badge"><i data-lucide="cloud" style="width:12px;height:12px;display:inline;vertical-align:-2px;margin-right:3px;"></i> AWS Cognito</span>
                 Authentication powered by Amazon Cognito User Pool
             </div>
         </div>
@@ -252,11 +253,11 @@
 
             <!-- Tab Bar -->
             <div class="tab-bar">
-                <button class="tab-btn active" id="tab-order" onclick="switchTab('order')">🍔 Place Order</button>
+                <button class="tab-btn active" id="tab-order" onclick="switchTab('order')"><i data-lucide="utensils" style="width:16px;height:16px;"></i> Place Order</button>
                 <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
-                    📋 My Orders <span class="tab-badge" id="orders-count" style="display:none">0</span>
+                    <i data-lucide="clipboard-list" style="width:16px;height:16px;"></i> My Orders <span class="tab-badge" id="orders-count" style="display:none">0</span>
                 </button>
-                <button class="tab-btn" id="tab-admin" onclick="switchTab('admin')">⚙️ Admin</button>
+                <button class="tab-btn" id="tab-admin" onclick="switchTab('admin')"><i data-lucide="settings" style="width:16px;height:16px;"></i> Admin</button>
             </div>
 
             <!-- ═══ TAB 1: Place Order ═══ -->
@@ -269,44 +270,44 @@
                     <!-- STEP 2: Restaurant Discovery -->
                     <div class="step-view active" id="step-restaurants">
                         <div class="restaurants-header">
-                            <h3 id="restaurants-heading">🍽️ Restaurants</h3>
-                            <span class="location-badge" id="location-badge">📍</span>
+                            <h3 id="restaurants-heading"><i data-lucide="store" style="width:20px;height:20px;display:inline;vertical-align:-4px;margin-right:6px;"></i>Restaurants</h3>
+                            <span class="location-badge" id="location-badge"><i data-lucide="map-pin" style="width:14px;height:14px;display:inline;vertical-align:-2px;"></i></span>
                         </div>
 
                         <!-- Search Bar -->
                         <div class="search-container">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"><i data-lucide="search" style="width:16px;height:16px;"></i></span>
                             <input class="search-input" type="text" id="search-input"
                                 placeholder="Search restaurants or dishes..."
                                 oninput="handleSearch(this.value)">
-                            <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+                            <button class="search-clear" id="search-clear" onclick="clearSearch()"><i data-lucide="x" style="width:14px;height:14px;"></i></button>
                         </div>
 
                         <!-- Filter Bar -->
                         <div class="filter-bar" id="filter-bar">
                             <button class="filter-pill" data-filter="sort" data-value="price-low"
-                                onclick="toggleFilter(this)">💰 Price ↑</button>
+                                onclick="toggleFilter(this)"><i data-lucide="arrow-up-narrow-wide" style="width:14px;height:14px;"></i> Price ↑</button>
                             <button class="filter-pill" data-filter="sort" data-value="price-high"
-                                onclick="toggleFilter(this)">💰 Price ↓</button>
+                                onclick="toggleFilter(this)"><i data-lucide="arrow-down-wide-narrow" style="width:14px;height:14px;"></i> Price ↓</button>
                             <span class="filter-divider"></span>
                             <button class="filter-pill" data-filter="rating" data-value="4"
-                                onclick="toggleFilter(this)">⭐ 4+</button>
+                                onclick="toggleFilter(this)"><i data-lucide="star" style="width:14px;height:14px;"></i> 4+</button>
                             <button class="filter-pill" data-filter="rating" data-value="3"
-                                onclick="toggleFilter(this)">⭐ 3+</button>
+                                onclick="toggleFilter(this)"><i data-lucide="star" style="width:14px;height:14px;"></i> 3+</button>
                             <span class="filter-divider"></span>
                             <button class="filter-pill" data-filter="offer" data-value="any"
-                                onclick="toggleFilter(this)">🏷️ Offers</button>
+                                onclick="toggleFilter(this)"><i data-lucide="tag" style="width:14px;height:14px;"></i> Offers</button>
                             <span class="filter-divider"></span>
                             <button class="filter-pill" data-filter="type" data-value="veg"
-                                onclick="toggleFilter(this)">🟢 Veg</button>
+                                onclick="toggleFilter(this)"><span class="veg-dot"></span> Veg</button>
                             <button class="filter-pill" data-filter="type" data-value="nonveg"
-                                onclick="toggleFilter(this)">🔴 Non-Veg</button>
+                                onclick="toggleFilter(this)"><span class="nonveg-dot"></span> Non-Veg</button>
                         </div>
 
                         <!-- Restaurant Grid -->
                         <div class="restaurant-grid" id="restaurant-grid"></div>
                         <div class="no-results" id="no-results" style="display:none">
-                            <div class="no-results-icon">🔍</div>
+                            <div class="no-results-icon"><i data-lucide="search-x" style="width:40px;height:40px;color:var(--text-3);"></i></div>
                             <h3>No restaurants found</h3>
                             <p>Try adjusting your search or filters</p>
                         </div>
@@ -333,15 +334,15 @@
                     <!-- STEP 4: Checkout -->
                     <div class="step-view" id="step-checkout">
                         <button class="menu-back" onclick="goToStep('menu')">← Back to Menu</button>
-                        <div class="card-title"><span>🛒</span> Confirm Your Order</div>
+                        <div class="card-title"><i data-lucide="shopping-cart" style="width:20px;height:20px;"></i> Confirm Your Order</div>
                         <div class="card-welcome" id="card-welcome"></div>
 
-                        <form id="order-form" autocomplete="off">
+                        <form id="order-form" autocomplete="off" onsubmit="return handleOrderSubmit(event)">
                             <!-- Order Summary -->
                             <div class="checkout-summary" id="checkout-summary"></div>
 
                             <!-- Personal Details -->
-                            <div class="checkout-section-title">👤 Personal Details</div>
+                            <div class="checkout-section-title"><i data-lucide="user" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Personal Details</div>
 
                             <div class="form-group">
                                 <label class="form-label" for="customerName">
@@ -372,10 +373,10 @@
                             </div>
 
                             <!-- Delivery Address -->
-                            <div class="checkout-section-title">📍 Delivery Address</div>
+                            <div class="checkout-section-title"><i data-lucide="map-pin" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Delivery Address</div>
 
                             <button type="button" class="btn-detect" onclick="detectLocation()">
-                                📍 Auto-detect my location
+                                <i data-lucide="locate" style="width:14px;height:14px;display:inline;vertical-align:-3px;margin-right:4px;"></i> Auto-detect my location
                             </button>
 
                             <!-- Map Picker -->
@@ -433,12 +434,12 @@
                             <input type="hidden" id="item">
 
                             <button class="btn" type="submit" id="submit-btn">
-                                <span class="label">🍔 Place Order</span>
+                                <span class="label"><i data-lucide="send" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Place Order</span>
                                 <span class="loading"><span class="spinner"></span> Placing your order…</span>
                             </button>
                             <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap">
-                                <span class="aws-badge"><span class="aws-badge-icon">⚡</span> Powered by Lambda</span>
-                                <span class="aws-badge blue"><span class="aws-badge-icon">📊</span> Stored in DynamoDB</span>
+                                <span class="aws-badge"><i data-lucide="zap" style="width:12px;height:12px;display:inline;vertical-align:-2px;margin-right:3px;"></i> Powered by Lambda</span>
+                                <span class="aws-badge blue"><i data-lucide="database" style="width:12px;height:12px;display:inline;vertical-align:-2px;margin-right:3px;"></i> Stored in DynamoDB</span>
                             </div>
                         </form>
 
@@ -471,7 +472,7 @@
             <!-- ═══ TAB 2: My Orders ═══ -->
             <div class="tab-panel" id="panel-history">
                 <div class="orders-card">
-                    <div class="card-title"><span>📋</span> Order History</div>
+                    <div class="card-title"><i data-lucide="clipboard-list" style="width:20px;height:20px;"></i> Order History</div>
                     <div class="card-welcome" id="history-welcome"></div>
                     <div class="orders-loading" id="orders-loading">
                         <div class="spinner-lg"></div> Fetching your orders…
@@ -489,29 +490,29 @@
             <div class="tab-panel" id="panel-admin">
                 <div class="admin-dashboard">
                     <div class="admin-header">
-                        <div class="card-title"><span>⚙️</span> Admin Dashboard</div>
+                        <div class="card-title"><i data-lucide="layout-dashboard" style="width:20px;height:20px;"></i> Admin Dashboard</div>
                         <div class="admin-subtitle">Real-time overview of your QuickBite operations</div>
                     </div>
 
                     <!-- Stats Cards -->
                     <div class="admin-stats-grid" id="admin-stats-grid">
                         <div class="admin-stat-card">
-                            <div class="admin-stat-icon">📦</div>
+                            <div class="admin-stat-icon"><i data-lucide="package" style="width:28px;height:28px;"></i></div>
                             <div class="admin-stat-value" id="stat-total-orders">0</div>
                             <div class="admin-stat-label">Total Orders</div>
                         </div>
                         <div class="admin-stat-card revenue">
-                            <div class="admin-stat-icon">💰</div>
+                            <div class="admin-stat-icon"><i data-lucide="indian-rupee" style="width:28px;height:28px;"></i></div>
                             <div class="admin-stat-value" id="stat-total-revenue">₹0</div>
                             <div class="admin-stat-label">Total Revenue</div>
                         </div>
                         <div class="admin-stat-card">
-                            <div class="admin-stat-icon">📊</div>
+                            <div class="admin-stat-icon"><i data-lucide="bar-chart-3" style="width:28px;height:28px;"></i></div>
                             <div class="admin-stat-value" id="stat-avg-order">₹0</div>
                             <div class="admin-stat-label">Avg Order Value</div>
                         </div>
                         <div class="admin-stat-card success-card">
-                            <div class="admin-stat-icon">✅</div>
+                            <div class="admin-stat-icon"><i data-lucide="check-circle" style="width:28px;height:28px;"></i></div>
                             <div class="admin-stat-value" id="stat-success-rate">0%</div>
                             <div class="admin-stat-label">Success Rate</div>
                         </div>
@@ -519,19 +520,19 @@
 
                     <!-- Revenue Chart -->
                     <div class="admin-section">
-                        <div class="admin-section-title">📈 Revenue Overview (Last 7 Days)</div>
+                        <div class="admin-section-title"><i data-lucide="trending-up" style="width:18px;height:18px;display:inline;vertical-align:-4px;margin-right:6px;"></i>Revenue Overview (Last 7 Days)</div>
                         <div class="admin-chart" id="admin-chart"></div>
                     </div>
 
                     <!-- Popular Items -->
                     <div class="admin-section">
-                        <div class="admin-section-title">🔥 Popular Items</div>
+                        <div class="admin-section-title"><i data-lucide="flame" style="width:18px;height:18px;display:inline;vertical-align:-4px;margin-right:6px;"></i>Popular Items</div>
                         <div class="admin-popular-items" id="admin-popular-items"></div>
                     </div>
 
                     <!-- Live Orders Table -->
                     <div class="admin-section">
-                        <div class="admin-section-title">📋 All Orders</div>
+                        <div class="admin-section-title"><i data-lucide="list-ordered" style="width:18px;height:18px;display:inline;vertical-align:-4px;margin-right:6px;"></i>All Orders</div>
                         <div class="admin-orders-table" id="admin-orders-table"></div>
                         <div class="admin-orders-empty" id="admin-orders-empty" style="display:none">
                             <div class="empty-icon">📭</div>
@@ -547,7 +548,7 @@
 
         <!-- How It Works — AWS Pipeline Storytelling -->
         <section class="flow" id="pipeline-section">
-            <div class="pipeline-section-chip">☁️ Live AWS Pipeline</div>
+            <div class="pipeline-section-chip"><i data-lucide="cloud" style="width:14px;height:14px;"></i> Live AWS Pipeline</div>
             <h2><span class="gradient-text">How Your Order Travels</span></h2>
             <p class="flow-sub">Watch your order flow through 6 serverless AWS services in real time</p>
             <div class="pipeline-progress-bar" id="pipeline-progress-bar">
@@ -556,23 +557,45 @@
             <div class="pipeline-container" id="pipeline-container"></div>
             <div class="pipeline-detail" id="pipeline-detail"></div>
             <button class="pipeline-replay-btn" id="pipeline-replay-btn" onclick="replayPipeline()" title="Replay animation">
-                <span class="replay-icon">↻</span> Replay Flow
+                <i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i> Replay Flow
             </button>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="footer-credit">Built with &#9749;&#65039; by <strong>Naman Panwar</strong> &mdash; QuickBite Serverless on <strong>AWS</strong></div>
-        <div class="footer-aws-bar" id="footer-aws-bar">
-            <span class="aws-badge"><span class="aws-badge-icon">🪣</span> S3</span>
-            <span class="aws-badge"><span class="aws-badge-icon">🌐</span> CloudFront</span>
-            <span class="aws-badge"><span class="aws-badge-icon">🚪</span> API Gateway</span>
-            <span class="aws-badge"><span class="aws-badge-icon">λ</span> Lambda</span>
-            <span class="aws-badge blue"><span class="aws-badge-icon">📊</span> DynamoDB</span>
-            <span class="aws-badge"><span class="aws-badge-icon">📨</span> SQS</span>
-            <span class="aws-badge"><span class="aws-badge-icon">📧</span> SES</span>
-            <span class="aws-badge"><span class="aws-badge-icon">🔔</span> SNS</span>
-            <span class="aws-badge blue"><span class="aws-badge-icon">📈</span> CloudWatch</span>
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="footer-logo"><i data-lucide="utensils" style="width:20px;height:20px;color:var(--accent);"></i> Quick<span style="color:var(--accent);">Bite</span></div>
+                <p class="footer-tagline">Serverless food ordering powered by AWS</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-link-group">
+                    <h4>Platform</h4>
+                    <a href="#" onclick="switchTab('order');return false;">Place Order</a>
+                    <a href="#" onclick="switchTab('history');return false;">My Orders</a>
+                    <a href="#" onclick="switchTab('admin');return false;">Admin Dashboard</a>
+                </div>
+                <div class="footer-link-group">
+                    <h4>AWS Services</h4>
+                    <a href="services/lambda.html">Lambda</a>
+                    <a href="services/dynamodb.html">DynamoDB</a>
+                    <a href="services/s3.html">S3 &amp; CloudFront</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-credit">Built by <strong>Naman Panwar</strong> · QuickBite Serverless on <strong>AWS</strong></div>
+            <div class="footer-aws-bar" id="footer-aws-bar">
+                <span class="aws-badge"><i data-lucide="hard-drive" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> S3</span>
+                <span class="aws-badge"><i data-lucide="globe" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> CloudFront</span>
+                <span class="aws-badge"><i data-lucide="door-open" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> API GW</span>
+                <span class="aws-badge"><i data-lucide="code" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> Lambda</span>
+                <span class="aws-badge blue"><i data-lucide="database" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> DynamoDB</span>
+                <span class="aws-badge"><i data-lucide="mail-plus" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> SQS</span>
+                <span class="aws-badge"><i data-lucide="mail" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> SES</span>
+                <span class="aws-badge"><i data-lucide="bell" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> SNS</span>
+                <span class="aws-badge blue"><i data-lucide="activity" style="width:11px;height:11px;display:inline;vertical-align:-2px;margin-right:3px;"></i> CloudWatch</span>
+            </div>
         </div>
     </footer>
 
@@ -604,22 +627,22 @@
     <div class="location-modal-overlay" id="location-modal-overlay"></div>
     <div class="location-modal" id="location-modal">
         <div class="loc-modal-inner">
-            <div class="loc-modal-icon">📍</div>
+            <div class="loc-modal-icon"><i data-lucide="map-pin" style="width:48px;height:48px;color:var(--accent);"></i></div>
             <h2>Enable Location</h2>
             <p>Allow QuickBite to detect your city for accurate restaurant results</p>
             <div class="loc-modal-spinner" id="loc-modal-spinner" style="display:none"></div>
             <div class="loc-modal-status" id="loc-modal-status"></div>
             <button class="btn" id="loc-modal-gps-btn" onclick="requestGPSLocation()">
-                <span class="label">📍 Detect My Location</span>
+                <span class="label"><i data-lucide="locate" style="width:16px;height:16px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Detect My Location</span>
             </button>
             <div class="loc-modal-divider">or select your city</div>
             <div class="loc-modal-cities">
-                <button class="city-chip" onclick="selectCityManual('una')">📍 Una, Gujarat</button>
-                <button class="city-chip" onclick="selectCityManual('bhiwani')">📍 Bhiwani, Haryana</button>
-                <button class="city-chip" onclick="selectCityManual('new delhi')">📍 New Delhi</button>
-                <button class="city-chip" onclick="selectCityManual('mumbai')">📍 Mumbai</button>
-                <button class="city-chip" onclick="selectCityManual('ahmedabad')">📍 Ahmedabad</button>
-                <button class="city-chip" onclick="selectCityManual('jaipur')">📍 Jaipur</button>
+                <button class="city-chip" onclick="selectCityManual('una')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Una, Gujarat</button>
+                <button class="city-chip" onclick="selectCityManual('bhiwani')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Bhiwani, Haryana</button>
+                <button class="city-chip" onclick="selectCityManual('new delhi')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> New Delhi</button>
+                <button class="city-chip" onclick="selectCityManual('mumbai')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Mumbai</button>
+                <button class="city-chip" onclick="selectCityManual('ahmedabad')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Ahmedabad</button>
+                <button class="city-chip" onclick="selectCityManual('jaipur')"><i data-lucide="map-pin" style="width:12px;height:12px;"></i> Jaipur</button>
             </div>
         </div>
     </div>
@@ -630,7 +653,7 @@
         <button class="service-modal-close" onclick="closePaymentModal()">✕</button>
         <div class="payment-modal-inner">
             <div class="payment-header">
-                <div class="payment-header-icon">💳</div>
+                <div class="payment-header-icon"><i data-lucide="credit-card" style="width:28px;height:28px;"></i></div>
                 <div>
                     <div class="payment-header-title">Payment</div>
                     <div class="payment-header-amount" id="payment-amount">₹0</div>
@@ -640,13 +663,13 @@
             <!-- Payment Method Tabs -->
             <div class="payment-methods" id="payment-methods">
                 <button class="payment-method-tab active" data-method="card" onclick="selectPaymentMethod('card')">
-                    💳 Card
+                    <i data-lucide="credit-card" style="width:14px;height:14px;"></i> Card
                 </button>
                 <button class="payment-method-tab" data-method="upi" onclick="selectPaymentMethod('upi')">
-                    📱 UPI
+                    <i data-lucide="smartphone" style="width:14px;height:14px;"></i> UPI
                 </button>
                 <button class="payment-method-tab" data-method="cod" onclick="selectPaymentMethod('cod')">
-                    💵 Cash
+                    <i data-lucide="banknote" style="width:14px;height:14px;"></i> Cash
                 </button>
             </div>
 
@@ -692,7 +715,7 @@
             <!-- COD Form -->
             <div class="payment-form" id="pay-form-cod" style="display:none">
                 <div class="cod-info">
-                    <div class="cod-icon">💵</div>
+                    <div class="cod-icon"><i data-lucide="wallet" style="width:40px;height:40px;color:var(--accent);"></i></div>
                     <h4>Cash on Delivery</h4>
                     <p>Pay when your order arrives. Please keep exact change ready.</p>
                 </div>
@@ -726,7 +749,7 @@
             </button>
 
             <div class="payment-secure-note">
-                <span>🔒</span> Secured by AWS • 256-bit encryption
+                <i data-lucide="lock" style="width:14px;height:14px;"></i> Secured by AWS · 256-bit encryption
             </div>
         </div>
     </div>
@@ -769,10 +792,10 @@
     <!-- Sticky Bottom Cart Bar (Swiggy-style) -->
     <div class="cart-bar" id="cart-bar">
         <div class="cart-bar-left">
-            🛒 <span class="cart-bar-count" id="cart-bar-count">0</span> item(s) &nbsp;|&nbsp;
+            <i data-lucide="shopping-cart" style="width:18px;height:18px;"></i> <span class="cart-bar-count" id="cart-bar-count">0</span> item(s) &nbsp;|&nbsp;
             <span class="cart-bar-total" id="cart-bar-total">₹0</span>
         </div>
-        <button class="cart-bar-btn" onclick="openCartDrawer()">View Cart →</button>
+        <button class="cart-bar-btn" onclick="openCartDrawer()">View Cart <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline;vertical-align:-2px;"></i></button>
     </div>
 
     <!-- Cart Overlay -->
@@ -781,8 +804,8 @@
     <!-- Cart Drawer -->
     <div class="cart-drawer" id="cart-drawer">
         <div class="cart-drawer-header">
-            <div class="cart-drawer-title">🛒 Your Cart</div>
-            <button class="cart-drawer-close" onclick="closeCartDrawer()">✕</button>
+            <div class="cart-drawer-title"><i data-lucide="shopping-cart" style="width:18px;height:18px;display:inline;vertical-align:-3px;margin-right:6px;"></i>Your Cart</div>
+            <button class="cart-drawer-close" onclick="closeCartDrawer()"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
         </div>
         <div id="cart-drawer-body"></div>
     </div>

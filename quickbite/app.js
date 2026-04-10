@@ -15,10 +15,12 @@ function toggleTheme() {
     const n = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", n);
     localStorage.setItem("quickbite-theme", n);
-    const icon = n === "dark" ? "🌙" : "☀️";
-    document.getElementById("theme-icon").textContent = icon;
-    const di = document.getElementById("dropdown-theme-icon");
-    if (di) di.textContent = icon;
+    const iconName = n === "dark" ? "moon" : "sun";
+    const iconEl = document.getElementById("theme-icon");
+    if (iconEl) {
+        iconEl.innerHTML = `<i data-lucide="${iconName}" style="width:16px;height:16px;"></i>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
 }
 
 // ═══ STATE ═══
@@ -1080,44 +1082,62 @@ function detectLocation() {
 
 // ═══ ORDER SUBMISSION (now triggers payment modal) ═══
 async function handleOrderSubmit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
-    const name = document.getElementById("customerName").value.trim();
-    const email = document.getElementById("customerEmail").value.trim();
-    const phone = document.getElementById("customerPhone").value.trim();
-    const houseNo = document.getElementById("customerHouse").value.trim();
-    const street = document.getElementById("customerStreet").value.trim();
-    const area = document.getElementById("customerArea").value.trim();
-    const landmark = document.getElementById("customerLandmark").value.trim();
-    const city = document.getElementById("customerCity").value.trim();
-    const state = document.getElementById("customerState").value.trim();
-    const pincode = document.getElementById("customerPincode").value.trim();
-    const deliveryNote = document.getElementById("customerDeliveryNote")?.value.trim() || "";
+    try {
+        const nameEl = document.getElementById("customerName") || {};
+        const emailEl = document.getElementById("customerEmail") || {};
+        const phoneEl = document.getElementById("customerPhone") || {};
+        const houseEl = document.getElementById("customerHouse") || {};
+        const streetEl = document.getElementById("customerStreet") || {};
+        const areaEl = document.getElementById("customerArea") || {};
+        const landmarkEl = document.getElementById("customerLandmark") || {};
+        const cityEl = document.getElementById("customerCity") || {};
+        const stateEl = document.getElementById("customerState") || {};
+        const pinEl = document.getElementById("customerPincode") || {};
+        const noteEl = document.getElementById("customerDeliveryNote") || {};
 
-    const fullAddress = [houseNo, street, area, landmark, city, state, pincode].filter(Boolean).join(", ");
+        const name = (nameEl.value || "").trim();
+        const email = (emailEl.value || "").trim();
+        const phone = (phoneEl.value || "").trim();
+        const houseNo = (houseEl.value || "").trim();
+        const street = (streetEl.value || "").trim();
+        const area = (areaEl.value || "").trim();
+        const landmark = (landmarkEl.value || "").trim();
+        const city = (cityEl.value || "").trim();
+        const state = (stateEl.value || "").trim();
+        const pincode = (pinEl.value || "").trim();
+        const deliveryNote = (noteEl.value || "").trim();
 
-    // Check for city mismatch
-    const normalizedDeliveryCity = normalizeCity(city);
-    if (normalizedDeliveryCity && normalizedDeliveryCity !== currentCity && currentCity !== "") {
-        const proceed = confirm(`⚠️ Location Mismatch!\n\nYou selected restaurants from ${currentCity.toUpperCase()}, but your delivery address city is ${city.toUpperCase()}.\n\nAre you sure you want to place this order? QuickBite might not deliver cross-city.`);
-        if (!proceed) return;
+        const fullAddress = [houseNo, street, area, landmark, city, state, pincode].filter(Boolean).join(", ");
+
+        // Check for city mismatch
+        const normalizedDeliveryCity = normalizeCity(city);
+        if (normalizedDeliveryCity && normalizedDeliveryCity !== currentCity && currentCity !== "") {
+            const proceed = window.confirm(`⚠️ Location Mismatch!\n\nYou selected restaurants from ${currentCity.toUpperCase()}, but your delivery address city is ${city.toUpperCase()}.\n\nAre you sure you want to place this order? QuickBite might not deliver cross-city.`);
+            if (!proceed) return false;
+        }
+
+        // Store order payload for after payment
+        window._pendingOrderPayload = {
+            customerName: name,
+            customerEmail: email,
+            customerPhone: "+91" + phone,
+            item: document.getElementById("item") ? document.getElementById("item").value : "",
+            address: fullAddress,
+            deliveryAddress: { houseNo, street, area, landmark, city, state, pincode, deliveryNote },
+            deliveryCity: currentCity,
+            cart: cart.map(c => ({ name: c.name, price: c.price, qty: c.qty, restaurantId: String(c.restId), restaurantName: c.restName })),
+            email: email
+        };
+
+        // Open payment modal instead of directly placing order
+        openPaymentModal();
+    } catch (err) {
+        console.error("Order submit failed:", err);
+        showToast("Error processing order details. Please check all fields.", "error");
     }
-
-    // Store order payload for after payment
-    window._pendingOrderPayload = {
-        customerName: name,
-        customerEmail: email,
-        customerPhone: "+91" + phone,
-        item: document.getElementById("item").value,
-        address: fullAddress,
-        deliveryAddress: { houseNo, street, area, landmark, city, state, pincode, deliveryNote },
-        deliveryCity: currentCity,
-        cart: cart.map(c => ({ name: c.name, price: c.price, qty: c.qty, restaurantId: String(c.restId), restaurantName: c.restName })),
-        email: email
-    };
-
-    // Open payment modal instead of directly placing order
-    openPaymentModal();
+    return false;
 }
 
 // Actually place the order after payment success
@@ -1267,22 +1287,22 @@ function showToast(msg, type = "info") {
 
 // ═══ AWS SERVICE DATA (Enhanced for Modal) ═══
 const SERVICE_INFO = {
-    s3: { icon: "🪣", name: "Amazon S3", desc: "Simple Storage Service — scalable object storage for any type of data. Designed for 99.999999999% durability.", usage: "Hosts the entire QuickBite frontend as a static website. All HTML, CSS, and JavaScript files are stored in an S3 bucket configured for web hosting.", flow: ["Build Frontend", "Upload to S3", "Enable Static Hosting", "CloudFront CDN"] },
-    cloudfront: { icon: "🌐", name: "CloudFront", desc: "Global Content Delivery Network — caches and serves content from 400+ edge locations worldwide with ultra-low latency.", usage: "Distributes the QuickBite website globally. When you load this page, CloudFront serves it from the nearest edge location for blazing-fast load times.", flow: ["User Request", "Edge Location", "Cache Check", "Serve Content"] },
-    "api-gateway": { icon: "🚪", name: "API Gateway", desc: "Fully managed API service — creates, publishes, and secures REST APIs at any scale. Handles throttling, CORS, and auth.", usage: "Exposes two endpoints: POST /order (place new order) and GET /orders (fetch order history). Routes all requests to Lambda functions.", flow: ["HTTP Request", "API Gateway", "Route to Lambda", "Return Response"] },
-    lambda: { icon: "λ", name: "AWS Lambda", desc: "Serverless compute — runs code in response to events without provisioning servers. Pay only for compute time used.", usage: "Two Lambda functions power QuickBite: OrderHandler (validates and saves orders to DynamoDB, pushes to SQS) and OrderProcessor (reads SQS, sends emails via SES/SNS).", flow: ["API Trigger", "OrderHandler λ", "Save to DynamoDB", "Push to SQS", "OrderProcessor λ"] },
-    dynamodb: { icon: "📊", name: "DynamoDB", desc: "NoSQL database — single-digit millisecond performance at any scale. Fully managed with built-in security and backup.", usage: "Stores all order records with partition key (orderId) and a Global Secondary Index (GSI) on email for fast order history queries.", flow: ["Lambda Writes", "DynamoDB Table", "GSI on Email", "Query Orders"] },
-    sqs: { icon: "📨", name: "Amazon SQS", desc: "Simple Queue Service — fully managed message queuing. Decouples and scales microservices, distributed systems.", usage: "Decouples order placement from notification processing. When an order is placed, it's queued in SQS. A separate Lambda polls the queue to send emails asynchronously.", flow: ["Order Placed", "Message to SQS", "Lambda Polls", "Process Async"] },
-    ses: { icon: "📧", name: "Amazon SES", desc: "Simple Email Service — reliable, scalable email sending. Supports HTML templates and high deliverability.", usage: "Sends professional HTML receipt emails to customers after order placement. Includes order details, item breakdown, and delivery address.", flow: ["Order Processed", "Build HTML Email", "SES Sends", "Customer Inbox"] },
-    sns: { icon: "🔔", name: "Amazon SNS", desc: "Simple Notification Service — pub/sub messaging for microservices, distributed systems, and serverless apps.", usage: "Notifies the restaurant owner instantly when a new order arrives. Sends alerts via email and can be extended to SMS notifications.", flow: ["New Order", "SNS Topic", "Push Notification", "Owner Alerted"] },
-    cloudwatch: { icon: "📈", name: "CloudWatch", desc: "Monitoring and observability — collects metrics, logs, and events from all AWS resources in real time.", usage: "Monitors all Lambda invocations, tracks API Gateway request counts, latency, and error rates. Enables debugging and performance optimization.", flow: ["Lambda Logs", "API Metrics", "Dashboard", "Alerts"] },
+    s3: { icon: '<i data-lucide="hard-drive" style="width:22px;height:22px;"></i>', name: "Amazon S3", desc: "Simple Storage Service — scalable object storage for any type of data. Designed for 99.999999999% durability.", usage: "Hosts the entire QuickBite frontend as a static website. All HTML, CSS, and JavaScript files are stored in an S3 bucket configured for web hosting.", flow: ["Build Frontend", "Upload to S3", "Enable Static Hosting", "CloudFront CDN"] },
+    cloudfront: { icon: '<i data-lucide="globe" style="width:22px;height:22px;"></i>', name: "CloudFront", desc: "Global Content Delivery Network — caches and serves content from 400+ edge locations worldwide with ultra-low latency.", usage: "Distributes the QuickBite website globally. When you load this page, CloudFront serves it from the nearest edge location for blazing-fast load times.", flow: ["User Request", "Edge Location", "Cache Check", "Serve Content"] },
+    "api-gateway": { icon: '<i data-lucide="door-open" style="width:22px;height:22px;"></i>', name: "API Gateway", desc: "Fully managed API service — creates, publishes, and secures REST APIs at any scale. Handles throttling, CORS, and auth.", usage: "Exposes two endpoints: POST /order (place new order) and GET /orders (fetch order history). Routes all requests to Lambda functions.", flow: ["HTTP Request", "API Gateway", "Route to Lambda", "Return Response"] },
+    lambda: { icon: '<i data-lucide="code" style="width:22px;height:22px;"></i>', name: "AWS Lambda", desc: "Serverless compute — runs code in response to events without provisioning servers. Pay only for compute time used.", usage: "Two Lambda functions power QuickBite: OrderHandler (validates and saves orders to DynamoDB, pushes to SQS) and OrderProcessor (reads SQS, sends emails via SES/SNS).", flow: ["API Trigger", "OrderHandler λ", "Save to DynamoDB", "Push to SQS", "OrderProcessor λ"] },
+    dynamodb: { icon: '<i data-lucide="database" style="width:22px;height:22px;"></i>', name: "DynamoDB", desc: "NoSQL database — single-digit millisecond performance at any scale. Fully managed with built-in security and backup.", usage: "Stores all order records with partition key (orderId) and a Global Secondary Index (GSI) on email for fast order history queries.", flow: ["Lambda Writes", "DynamoDB Table", "GSI on Email", "Query Orders"] },
+    sqs: { icon: '<i data-lucide="mail-plus" style="width:22px;height:22px;"></i>', name: "Amazon SQS", desc: "Simple Queue Service — fully managed message queuing. Decouples and scales microservices, distributed systems.", usage: "Decouples order placement from notification processing. When an order is placed, it's queued in SQS. A separate Lambda polls the queue to send emails asynchronously.", flow: ["Order Placed", "Message to SQS", "Lambda Polls", "Process Async"] },
+    ses: { icon: '<i data-lucide="mail" style="width:22px;height:22px;"></i>', name: "Amazon SES", desc: "Simple Email Service — reliable, scalable email sending. Supports HTML templates and high deliverability.", usage: "Sends professional HTML receipt emails to customers after order placement. Includes order details, item breakdown, and delivery address.", flow: ["Order Processed", "Build HTML Email", "SES Sends", "Customer Inbox"] },
+    sns: { icon: '<i data-lucide="bell" style="width:22px;height:22px;"></i>', name: "Amazon SNS", desc: "Simple Notification Service — pub/sub messaging for microservices, distributed systems, and serverless apps.", usage: "Notifies the restaurant owner instantly when a new order arrives. Sends alerts via email and can be extended to SMS notifications.", flow: ["New Order", "SNS Topic", "Push Notification", "Owner Alerted"] },
+    cloudwatch: { icon: '<i data-lucide="activity" style="width:22px;height:22px;"></i>', name: "CloudWatch", desc: "Monitoring and observability — collects metrics, logs, and events from all AWS resources in real time.", usage: "Monitors all Lambda invocations, tracks API Gateway request counts, latency, and error rates. Enables debugging and performance optimization.", flow: ["Lambda Logs", "API Metrics", "Dashboard", "Alerts"] },
 };
 
 // ═══ SERVICE MODAL ═══
 function openServiceModal(serviceKey) {
     const info = SERVICE_INFO[serviceKey];
     if (!info) return;
-    document.getElementById("smodal-icon").textContent = info.icon;
+    document.getElementById("smodal-icon").innerHTML = info.icon;
     document.getElementById("smodal-title").textContent = info.name;
     document.getElementById("smodal-desc").textContent = info.desc;
     document.getElementById("smodal-usage").textContent = info.usage;
@@ -1299,6 +1319,7 @@ function openServiceModal(serviceKey) {
     if (activeCard) activeCard.classList.add("active");
     document.getElementById("service-modal-overlay").classList.add("visible");
     document.getElementById("service-modal").classList.add("visible");
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function closeServiceModal() {
@@ -1313,7 +1334,7 @@ function showTooltip(el) {
     const info = SERVICE_INFO[key];
     if (!info) return;
     const container = document.getElementById("tooltip-container");
-    document.getElementById("tooltip-icon").textContent = info.icon;
+    document.getElementById("tooltip-icon").innerHTML = info.icon;
     document.getElementById("tooltip-name").textContent = info.name;
     document.getElementById("tooltip-desc").textContent = info.desc;
     document.getElementById("tooltip-usage").textContent = info.usage;
@@ -1325,7 +1346,7 @@ function showTooltip(el) {
     arrow.style.top = "-8px";
     arrow.style.left = "50%";
     arrow.style.transform = "translateX(-50%) rotate(225deg)";
-    requestAnimationFrame(() => container.classList.add("visible"));
+    requestAnimationFrame(() => { container.classList.add("visible"); if (typeof lucide !== 'undefined') lucide.createIcons(); });
 }
 
 function hideTooltip() {
@@ -1336,12 +1357,12 @@ function hideTooltip() {
 
 // ═══ ANIMATED PIPELINE — Step-based AWS Storytelling ═══
 const PIPELINE_STEPS = [
-    { icon: "🔐", name: "Sign In", aws: "Amazon Cognito", awsShort: "Cognito", detail: "User authenticates via AWS Cognito (Google OAuth or email/password). Session is created and stored securely.", awsLabel: "Using Amazon Cognito for authentication" },
-    { icon: "📝", name: "Submit", aws: "API Gateway", awsShort: "API GW", detail: "Order data is sent via HTTPS POST to API Gateway, which validates the request, handles CORS, and routes to Lambda.", awsLabel: "Handled by API Gateway" },
-    { icon: "λ", name: "Handler", aws: "Lambda + DynamoDB", awsShort: "Lambda", detail: "OrderHandler Lambda validates the payload, generates a unique orderId, writes to DynamoDB, and enqueues to SQS.", awsLabel: "Processed by AWS Lambda & stored in DynamoDB" },
-    { icon: "📨", name: "Queue", aws: "Amazon SQS", awsShort: "SQS", detail: "Order message sits in SQS queue. A separate OrderProcessor Lambda polls the queue asynchronously — fully decoupled.", awsLabel: "Order placed in SQS for async processing" },
-    { icon: "🔔", name: "Notify", aws: "Amazon SNS", awsShort: "SNS", detail: "OrderProcessor sends owner notification via SNS, then crafts a professional HTML receipt and sends it to customer via SES.", awsLabel: "SNS triggers notification to restaurant" },
-    { icon: "📧", name: "Email", aws: "Amazon SES", awsShort: "SES", detail: "Customer receives a beautifully formatted HTML email with order summary, delivery address, and order ID for tracking.", awsLabel: "SES sends confirmation email to you" }
+    { icon: '<i data-lucide="shield-check" style="width:24px;height:24px;"></i>', name: "Sign In", aws: "Amazon Cognito", awsShort: "Cognito", detail: "User authenticates via AWS Cognito (Google OAuth or email/password). Session is created and stored securely.", awsLabel: "Using Amazon Cognito for authentication" },
+    { icon: '<i data-lucide="send" style="width:24px;height:24px;"></i>', name: "Submit", aws: "API Gateway", awsShort: "API GW", detail: "Order data is sent via HTTPS POST to API Gateway, which validates the request, handles CORS, and routes to Lambda.", awsLabel: "Handled by API Gateway" },
+    { icon: '<i data-lucide="code" style="width:24px;height:24px;"></i>', name: "Handler", aws: "Lambda + DynamoDB", awsShort: "Lambda", detail: "OrderHandler Lambda validates the payload, generates a unique orderId, writes to DynamoDB, and enqueues to SQS.", awsLabel: "Processed by AWS Lambda & stored in DynamoDB" },
+    { icon: '<i data-lucide="mail-plus" style="width:24px;height:24px;"></i>', name: "Queue", aws: "Amazon SQS", awsShort: "SQS", detail: "Order message sits in SQS queue. A separate OrderProcessor Lambda polls the queue asynchronously — fully decoupled.", awsLabel: "Order placed in SQS for async processing" },
+    { icon: '<i data-lucide="bell" style="width:24px;height:24px;"></i>', name: "Notify", aws: "Amazon SNS", awsShort: "SNS", detail: "OrderProcessor sends owner notification via SNS, then crafts a professional HTML receipt and sends it to customer via SES.", awsLabel: "SNS triggers notification to restaurant" },
+    { icon: '<i data-lucide="mail" style="width:24px;height:24px;"></i>', name: "Email", aws: "Amazon SES", awsShort: "SES", detail: "Customer receives a beautifully formatted HTML email with order summary, delivery address, and order ID for tracking.", awsLabel: "SES sends confirmation email to you" }
 ];
 
 let pipelineAutoInterval = null;
@@ -1360,7 +1381,7 @@ function renderPipeline() {
             <div class="pipeline-name">${step.name}</div>
             <div class="pipeline-aws">${step.awsShort}</div>
             <div class="pipeline-float-label" id="float-label-${i}">
-                <span class="float-label-icon">☁️</span>
+                <span class="float-label-icon"><i data-lucide="cloud" style="width:14px;height:14px;"></i></span>
                 <span class="float-label-text">${step.awsLabel}</span>
             </div>
         </div>`;
@@ -1372,6 +1393,8 @@ function renderPipeline() {
         html += `</div>`;
     });
     container.innerHTML = html;
+    // Re-initialize Lucide icons for dynamically rendered pipeline
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function clickPipelineStep(index) {
@@ -1417,8 +1440,9 @@ function setActivePipelineStep(index) {
     const detail = document.getElementById("pipeline-detail");
     if (detail && PIPELINE_STEPS[index]) {
         const s = PIPELINE_STEPS[index];
-        detail.innerHTML = `<div class="pipeline-detail-header"><span class="pipeline-detail-icon">${s.icon}</span><span class="pipeline-detail-title">${s.name} — ${s.aws}</span></div><div class="pipeline-detail-text">${s.detail}</div><div class="pipeline-detail-badge"><span class="aws-badge"><span class="aws-badge-icon">☁️</span> ${s.aws}</span></div>`;
+        detail.innerHTML = `<div class="pipeline-detail-header"><span class="pipeline-detail-icon">${s.icon}</span><span class="pipeline-detail-title">${s.name} — ${s.aws}</span></div><div class="pipeline-detail-text">${s.detail}</div><div class="pipeline-detail-badge"><span class="aws-badge"><i data-lucide="cloud" style="width:12px;height:12px;display:inline;vertical-align:-2px;margin-right:3px;"></i> ${s.aws}</span></div>`;
         detail.classList.add("visible");
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
 
@@ -1575,6 +1599,10 @@ updateCartUI = function() {
 
 // ═══ INIT ENHANCEMENTS ═══
 document.addEventListener("DOMContentLoaded", function() {
+    // Initialize Lucide SVG icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
     renderPipeline();
     initPipelineObserver();
     setTimeout(initRipples, 500);
@@ -1583,6 +1611,14 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("keydown", function(e) {
         if (e.key === "Escape") closeServiceModal();
     });
+    // Set correct initial theme icon
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+    const themeEl = document.getElementById("theme-icon");
+    if (themeEl) {
+        const iconName = currentTheme === "dark" ? "moon" : "sun";
+        themeEl.innerHTML = `<i data-lucide="${iconName}" style="width:16px;height:16px;"></i>`;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
 });
 
 // ═══ UTILITIES ═══
